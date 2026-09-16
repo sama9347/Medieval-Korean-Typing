@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>중세국어 수업 플랫폼 (수업용 플레이어)</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="font-nanum">
+    <div id="app-container">
+        <!-- 1. 상단 네비게이션 헤더 & 수업 도구 툴바 -->
+        <header id="top-header">
+            <div class="header-left">
+                <div class="brand-title" onclick="SlideEngine.goToSlide(1)">
+                    <span>훈민정음</span>
+                    <span class="brand-badge">중세국어 수업</span>
+                </div>
+                <div class="section-indicator" id="current-section-text">[도입] 중세국어 시작</div>
+            </div>
+
+            <div class="header-center">
+                <div class="slide-counter" id="slide-counter-display">1 / 62</div>
+            </div>
+
+            <div class="header-right">
+                <!-- 폰트 선택기 (기본값: 나눔바른고딕 옛한글) -->
+                <select id="font-selector" class="font-selector-select" title="옛한글 폰트 변경">
+                    <option value="nanum" selected>나눔바른고딕 옛한글 (기본)</option>
+                    <option value="batang">함초롬바탕</option>
+                    <option value="hoonmin">한컴 훈민정음 가로쓰기</option>
+                </select>
+
+                <!-- 슬라이드 위 펜 모드 토글 -->
+                <button id="btn-toggle-overlay-pen" class="btn-tool" onclick="WhiteboardEngine.toggleOverlayPen()" title="슬라이드 위에 직접 필기 (단축키: P)">
+                    ✏️ <span>슬라이드 펜</span>
+                </button>
+
+                <!-- 칠판/화이트보드 열기 -->
+                <button class="btn-tool" onclick="WhiteboardEngine.openFullscreenBoard('chalkboard')" title="초록 분필 칠판 열기 (단축키: B)">
+                    🟩 <span>분필 칠판</span>
+                </button>
+                <button class="btn-tool" onclick="WhiteboardEngine.openFullscreenBoard('whiteboard')" title="화이트보드 열기 (단축키: W)">
+                    ⬜ <span>화이트보드</span>
+                </button>
+
+                <!-- 두벌식 옛글 타이핑 모달 토글 -->
+                <button class="btn-tool btn-primary-action" onclick="toggleYetTypingModal()" title="두벌식 옛글 입력기 열기 (단축키: T)">
+                    ⌨️ <span>옛글 타이핑</span>
+                </button>
+
+                <!-- 레이저 포인터 -->
+                <button id="btn-toggle-laser" class="btn-tool" onclick="SlideEngine.toggleLaser()" title="레이저 포인터 (단축키: L)">
+                    🔴 <span>포인터</span>
+                </button>
+
+                <!-- 목차 열기 -->
+                <button class="btn-tool" onclick="SlideEngine.toggleTOC()" title="전체 슬라이드 목차 (단축키: M)">
+                    📑 <span>목차</span>
+                </button>
+
+                <!-- 전체화면 -->
+                <button class="btn-tool" onclick="SlideEngine.toggleFullscreen()" title="전체화면 (F11)">
+                    ⛶
+                </button>
+
+                <!-- 편집 스튜디오 열기 링크 -->
+                <a href="editor.html" target="_blank" class="btn-tool" style="background: #e67e22; color: #fff; text-decoration: none;" title="파워포인트급 편집 스튜디오 열기">
+                    🎨 <span>편집기</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- 2. 메인 슬라이드 뷰포트 (16:9 반응형 스케일러) -->
+        <main id="presentation-viewport">
+            <div id="slide-canvas-scaler">
+                <div class="slide-content-wrapper" id="slide-content-container">
+                    <!-- 슬라이드 내용 동적 주입 -->
+                </div>
+
+                <!-- 슬라이드 위 투명 드로잉 캔버스 오버레이 -->
+                <div id="whiteboard-overlay">
+                    <canvas id="drawing-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- 레이저 포인터 커서 점 -->
+            <div id="laser-pointer-dot" style="position: fixed; width: 14px; height: 14px; background: #ff0055; border-radius: 50%; box-shadow: 0 0 12px #ff0055; pointer-events: none; display: none; z-index: 999; transform: translate(-50%, -50%);"></div>
+        </main>
+
+        <!-- 3. 하단 슬라이드 네비게이션 제어 바 -->
+        <footer id="bottom-control-bar">
+            <div class="nav-buttons-group">
+                <button class="btn-tool" onclick="SlideEngine.prevSlide()" title="이전 슬라이드 (←, PageUp)">
+                    ◀ 이전
+                </button>
+                <button class="btn-tool" onclick="SlideEngine.nextSlide()" title="다음 슬라이드 (→, Space, PageDown)">
+                    다음 ▶
+                </button>
+            </div>
+
+            <!-- 프로그레스 바 -->
+            <div class="progress-bar-container" onclick="SlideEngine.toggleTOC()">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+
+            <div class="nav-buttons-group">
+                <button class="btn-tool" onclick="WhiteboardEngine.clearBoard('overlay')" title="슬라이드 위 필기 전체 지우기">
+                    🗑️ 필기 지우기
+                </button>
+                <button class="btn-tool" onclick="WhiteboardEngine.undo('overlay')" title="필기 되돌리기 (Undo)">
+                    ↩ 되돌리기
+                </button>
+            </div>
+        </footer>
+
+        <!-- 4. 전체화면 칠판/화이트보드 모달 -->
+        <div id="fullscreen-board-modal">
+            <div id="modal-board-container" class="board-container-chalkboard" style="width: 100%; height: 100%; position: relative;">
+                <canvas id="modal-board-canvas" style="width: 100%; height: 100%; display: block; cursor: crosshair;"></canvas>
+
+                <!-- 플로팅 분필/펜 툴바 -->
+                <div id="board-toolbar">
+                    <div class="tool-group">
+                        <button class="btn-tool btn-tool-mode active" id="tool-pen" title="분필 / 펜">✏️ 분필</button>
+                        <button class="btn-tool btn-tool-mode" id="tool-highlighter" title="형광펜 (반투명 강조)">🖍️ 형광펜</button>
+                        <button class="btn-tool btn-tool-mode" id="tool-eraser" title="지우개">🧹 지우개</button>
+                    </div>
+
+                    <!-- 색상 팔레트 -->
+                    <div class="tool-group">
+                        <div class="color-dot selected" style="background: #f1c40f;" data-color="#f1c40f" title="노랑 분필"></div>
+                        <div class="color-dot" style="background: #ffffff;" data-color="#ffffff" title="흰색 분필"></div>
+                        <div class="color-dot" style="background: #e74c3c;" data-color="#e74c3c" title="빨강 분필"></div>
+                        <div class="color-dot" style="background: #3498db;" data-color="#3498db" title="하늘색 분필"></div>
+                        <div class="color-dot" style="background: #2ecc71;" data-color="#2ecc71" title="연두색 분필"></div>
+                        <div class="color-dot" style="background: #e67e22;" data-color="#e67e22" title="주황색 분필"></div>
+                    </div>
+
+                    <div class="tool-group">
+                        <button class="btn-tool" onclick="WhiteboardEngine.undo('modal')" title="되돌리기">↩ Undo</button>
+                        <button class="btn-tool" onclick="WhiteboardEngine.clearBoard('modal')" title="전체 지우기">🗑️ Clear</button>
+                        <button class="btn-tool" onclick="WhiteboardEngine.captureAndDownload()" title="판서 내용 PNG 다운로드">💾 판서 저장</button>
+                        <button class="btn-tool" onclick="toggleYetTypingModal()" title="옛글 타이핑 열기">⌨️ 옛글</button>
+                        <button class="btn-tool" onclick="WhiteboardEngine.closeFullscreenBoard()" style="background: #c0392b; color: #fff;" title="칠판 닫기 (Esc)">✕ 닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 두벌식 옛글 타이핑 & 가상 키보드 패널 -->
+        <div id="yet-typing-modal">
+            <div class="modal-header">
+                <span>⌨️ 중세국어 두벌식 옛글 입력기</span>
+                <span style="cursor: pointer; font-size: 20px;" onclick="closeYetTypingModal()">✕</span>
+            </div>
+            <div class="modal-body">
+                <textarea id="yet-input-box" class="yet-input-field" placeholder="키보드로 두벌식 옛글을 타이핑하거나 아래 자모를 클릭하세요. (예: Shift+K = ㆍ, Shift+A = ㅿ, Shift+D = ㆁ, Shift+G = ㆆ, . = 거성 방점)"></textarea>
+                
+                <!-- 대형 글자 실시간 미리보기 -->
+                <div style="background: #090c10; padding: 14px; border-radius: 8px; border: 1.5px solid #2d3748;">
+                    <div style="font-size: 13px; color: #a0aec0; margin-bottom: 6px;">대형 글자 실시간 렌더링:</div>
+                    <div id="yet-typing-preview" style="font-size: 38px; color: #e5b869; font-family: var(--font-primary); min-height: 54px; word-break: break-all; line-height: 1.6;">
+                        입력 결과가 여기에 크게 표시됩니다.
+                    </div>
+                </div>
+
+                <!-- 터치/클릭 가상 옛자모 빠른 입력 패드 -->
+                <div>
+                    <div style="font-size: 13.5px; color: #cbd5e1; margin-bottom: 6px; font-weight: 600;">빠른 옛자모 입력:</div>
+                    <div class="quick-jamo-pad">
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ㆍ')">ㆍ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ᆢ')">ᆢ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ㅿ')">ㅿ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ㆁ')">ㆁ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ㆆ')">ㆆ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ㅸ')">ㅸ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ㅄ')">ㅄ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ㅳ')">ㅳ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ᄡ')">ᄡ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ᄢ')">ᄢ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ᅇ')">ᅇ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ᆡ')">ᆡ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('\u302E')">· (거성)</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('\u302F')">·· (상성)</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ㆅ')">ㆅ</button>
+                        <button class="btn-jamo" onclick="YetHangulIME.insertText('ᄛ')">ᄛ</button>
+                    </div>
+                </div>
+
+                <!-- 하단 액션 버튼 -->
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px;">
+                    
+                
+                <button class="btn-tool" style="background: #2b6cb0; color: #fff; font-weight: 700;" onclick="YetHangulIME.convertInputToNFC()" title="표준 완성형 (NFC)">
+                    🔄 표준 완성형 (NFC)
+                </button>
+                <button class="btn-tool" style="background: #5b21b6; color: #fff;" onclick="YetHangulIME.convertInputToNFD()" title="순수 조합형 (NFD)">
+                    🔀 조합형 분해 (NFD)
+                </button>
+                <button class="btn-tool btn-primary-action" onclick="copyYetText()">📋 텍스트 복사</button>
+
+
+                    <button class="btn-tool" onclick="YetHangulIME.reset()">지우기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 목차 사이드바 서랍 (TOC Drawer) -->
+        <aside id="toc-drawer">
+            <div class="toc-header">
+                <span>📑 전체 슬라이드 목차 (62)</span>
+                <button class="btn-tool" onclick="SlideEngine.toggleTOC()">✕</button>
+            </div>
+            <div class="toc-list-container" id="toc-list-items">
+                <!-- 목차 항목 동적 주입 -->
+            </div>
+        </aside>
+
+        <!-- 7. 인터랙티브 문법 설명 팝업 모달 -->
+        <div id="interactive-popup">
+            <div class="popup-title">
+                <span id="popup-title-text">문법 개념</span>
+                <span style="cursor: pointer; margin-left: auto; font-size: 22px;" onclick="hideGrammarModal()">✕</span>
+            </div>
+            <div class="popup-body" id="popup-body-text">
+                해설 내용
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 로드 -->
+    <script src="js/slides-data.js"></script>
+    <script src="js/yet-hangul-ime.js"></script>
+    <script src="js/whiteboard.js"></script>
+    <script src="js/slide-engine.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            SlideEngine.init();
+            WhiteboardEngine.init();
+            
+            const inputBox = document.getElementById('yet-input-box');
+            if (inputBox) {
+                YetHangulIME.bindInput(inputBox);
+            }
+        });
+    </script>
+</body>
+</html>

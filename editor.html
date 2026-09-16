@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>중세국어 슬라이드 편집 스튜디오 (PowerPoint Studio)</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/editor.css">
+</head>
+<body class="editor-body">
+    <!-- 1. 상단 MS PowerPoint 스타일 리본 메뉴 바 -->
+    <header id="ribbon-header">
+        <!-- 상단 타이틀 바 & 탭 버튼 -->
+        <div class="ribbon-top-bar">
+            <div class="editor-logo">
+                <span>🎨 중세국어 슬라이드 편집 스튜디오</span>
+                <span class="editor-logo-badge">PowerPoint급</span>
+            </div>
+            <div class="ribbon-tabs">
+                <div class="ribbon-tab active" data-tab="home">홈 (서식)</div>
+                <div class="ribbon-tab" data-tab="insert">삽입</div>
+                <div class="ribbon-tab" data-tab="slides">슬라이드 관리</div>
+                <div class="ribbon-tab" data-tab="export">저장 & 내보내기</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <!-- 옛글 타이핑 스튜디오 버튼 -->
+                <button class="ribbon-btn" style="background: #2b6cb0; color: #fff; flex-direction: row; padding: 6px 12px;" onclick="PPTStudio.openYetTypingStudio()" title="함초롬바탕 중세국어 두벌식 옛글 타이핑 창 열기">
+                    ⌨️ <span>옛글 타이핑</span>
+                </button>
+                <!-- 수업용 플레이어 실행 링크 -->
+                <a href="index.html" target="_blank" class="ribbon-btn" style="background: #27ae60; color: #fff; flex-direction: row; padding: 6px 14px; text-decoration: none;" title="수업용 플레이어 새 탭에서 실행">
+                    ▶️ <span>수업 모드로 실행</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 탭별 서브 툴바 (리본 메뉴) -->
+        <div class="ribbon-toolbar">
+            <!-- [탭 1] 홈 (서식) 툴바 -->
+            <div class="ribbon-toolbar-panel" id="tab-panel-home" style="display: flex; gap: 16px; align-items: center;">
+                <!-- 폰트 선택 그룹 (선택한 글자 서체 즉시 변경) -->
+                <div class="ribbon-group">
+                    <select class="ribbon-select" onchange="PPTStudio.applyFontToSelection(this.value); this.selectedIndex = 0;" title="드래그한 글자의 서체 변경">
+                        <option value="" disabled selected>선택 글자 서체 변경 ▾</option>
+                        <option value="'NanumBarunGothicYetHangul', sans-serif">나눔바른고딕 옛한글</option>
+                        <option value="'HANBatang', serif">함초롬바탕 (옛글 표준)</option>
+                        <option value="'HancomHoonminjeongeum', serif">한컴 훈민정음</option>
+                        <option value="'ChosunGs', serif">조선궁서체 (한자)</option>
+                    </select>
+                    <button class="ribbon-btn" style="padding: 4px 6px; font-size: 11.5px;" onclick="PPTStudio.applyFontToSelection('ChosunGs, serif')" title="선택한 글자를 조선궁서체로 변경">
+                        <span>🈲 궁서</span>
+                    </button>
+                    <button class="ribbon-btn" style="padding: 4px 6px; font-size: 11.5px;" onclick="PPTStudio.applyFontToSelection('HancomHoonminjeongeum, serif')" title="선택한 글자를 훈민정음체로 변경">
+                        <span>📜 훈민</span>
+                    </button>
+                    <button class="ribbon-btn" style="padding: 4px 6px; font-size: 11.5px;" onclick="PPTStudio.applyFontToSelection('HANBatang, serif')" title="선택한 글자를 함초롬바탕으로 변경">
+                        <span>✍️ 바탕</span>
+                    </button>
+                    <button class="ribbon-btn" style="padding: 4px 6px; font-size: 11.5px;" onclick="PPTStudio.applyFontToSelection('NanumBarunGothicYetHangul, sans-serif')" title="선택한 글자를 나눔고딕으로 변경">
+                        <span>🔤 고딕</span>
+                    </button>
+                    <button class="ribbon-btn" style="padding: 4px 8px; font-size: 11.5px; background: #2b6cb0; color: #fff; border-color: #3182ce;" onclick="PPTStudio.applySmartFonts()" title="선택 상자나 글자 내의 한자는 조선궁서체, 옛글은 함초롬바탕, 현대어는 나눔고딕으로 1초 만에 자동 분리 스타일링">
+                        <span>✨ 스마트 서체 분리</span>
+                    </button>
+                </div>
+
+                <!-- 텍스트 스타일 그룹 -->
+                <div class="ribbon-group">
+                    <button class="ribbon-btn" onclick="PPTStudio.execFormat('bold')" title="굵게 (Ctrl+B)">
+                        <span class="ribbon-btn-icon"><b>B</b></span>
+                        <span>굵게</span>
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.execFormat('italic')" title="기울임 (Ctrl+I)">
+                        <span class="ribbon-btn-icon"><i>I</i></span>
+                        <span>기울임</span>
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.execFormat('underline')" title="밑줄 (Ctrl+U)">
+                        <span class="ribbon-btn-icon"><u>U</u></span>
+                        <span>밑줄</span>
+                    </button>
+                </div>
+
+                <!-- 글자색 & 배경 형광펜 -->
+                <div class="ribbon-group">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                        <input type="color" value="#111827" class="color-picker-input" onchange="PPTStudio.setTextColor(this.value)" title="글자 색상">
+                        <span style="font-size: 10px;">글자색</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                        <input type="color" value="#fef08a" class="color-picker-input" onchange="PPTStudio.setHighlightColor(this.value)" title="형광펜 배경색">
+                        <span style="font-size: 10px;">형광펜</span>
+                    </div>
+                </div>
+
+                <!-- 정렬 및 목록 -->
+                <div class="ribbon-group">
+                    <button class="ribbon-btn" onclick="PPTStudio.execFormat('justifyLeft')" title="왼쪽 정렬">
+                        <span class="ribbon-btn-icon">⇤</span>
+                        <span>왼쪽</span>
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.execFormat('justifyCenter')" title="가운데 정렬">
+                        <span class="ribbon-btn-icon">⇥⇤</span>
+                        <span>가운데</span>
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.execFormat('insertUnorderedList')" title="글머리 기호 목록">
+                        <span class="ribbon-btn-icon">•≣</span>
+                        <span>목록</span>
+                    </button>
+                </div>
+
+                <!-- 삭제 버튼 -->
+                <div class="ribbon-group">
+                    <button class="ribbon-btn" style="color: #e74c3c;" onclick="PPTStudio.deleteSelectedElement()" title="선택한 상자/요소 삭제 (Delete 키)">
+                        <span class="ribbon-btn-icon">🗑️</span>
+                        <span>상자 삭제</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- [탭 2] 삽입 툴바 -->
+            <div class="ribbon-toolbar-panel" id="tab-panel-insert" style="display: none; gap: 16px; align-items: center;">
+                <div class="ribbon-group">
+                    <button class="ribbon-btn" onclick="PPTStudio.insertTextBox()" title="텍스트 상자 추가">
+                        <span class="ribbon-btn-icon">💬</span>
+                        <span>텍스트 상자</span>
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.insertAncientBox()" title="함초롬바탕 중세국어 원문 구절 상자 추가">
+                        <span class="ribbon-btn-icon">📜</span>
+                        <span>원문 상자</span>
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.insertTable()" title="문법 정리 표 삽입">
+                        <span class="ribbon-btn-icon">📊</span>
+                        <span>문법 표</span>
+                    </button>
+                </div>
+                <div class="ribbon-group">
+                    <button class="ribbon-btn" onclick="PPTStudio.insertImageFromFile()" title="내 컴퓨터에서 사진/그림 삽입">
+                        <span class="ribbon-btn-icon">🖼️</span>
+                        <span>사진 삽입</span>
+                    </button>
+                    <button class="ribbon-btn" style="background: #2b6cb0; color: #fff;" onclick="PPTStudio.openYetTypingStudio()" title="중세국어 옛글 직접 타이핑 후 삽입">
+                        <span class="ribbon-btn-icon">⌨️</span>
+                        <span>옛글 입력 삽입</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- [탭 3] 슬라이드 관리 툴바 -->
+            <div class="ribbon-toolbar-panel" id="tab-panel-slides" style="display: none; gap: 16px; align-items: center;">
+                <div class="ribbon-group">
+                    <button class="ribbon-btn" onclick="PPTStudio.addNewSlide()" title="새 슬라이드 추가">
+                        <span class="ribbon-btn-icon">➕</span>
+                        <span>새 슬라이드</span>
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.duplicateSlide()" title="현재 슬라이드 복제">
+                        <span class="ribbon-btn-icon">📋</span>
+                        <span>슬라이드 복제</span>
+                    </button>
+                    <button class="ribbon-btn" style="color: #e74c3c;" onclick="PPTStudio.deleteSlide()" title="현재 슬라이드 삭제">
+                        <span class="ribbon-btn-icon">🗑️</span>
+                        <span>슬라이드 삭제</span>
+                    </button>
+                </div>
+                <div class="ribbon-group">
+                    <button class="ribbon-btn" onclick="PPTStudio.moveSlideUp()" title="슬라이드 위로 이동">
+                        <span class="ribbon-btn-icon">⬆️</span>
+                        <span>위로 이동</span>
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.moveSlideDown()" title="슬라이드 아래로 이동">
+                        <span class="ribbon-btn-icon">⬇️</span>
+                        <span>아래로 이동</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- [탭 4] 저장 & 내보내기 툴바 -->
+            <div class="ribbon-toolbar-panel" id="tab-panel-export" style="display: none; gap: 16px; align-items: center;">
+                <div class="ribbon-group">
+                    <button class="ribbon-btn" style="background: #2b6cb0; color: #fff;" onclick="PPTStudio.exportFile()" title="수정한 슬라이드 전체를 slides-data.js 파일로 다운로드">
+                        <span class="ribbon-btn-icon">💾</span>
+                        <span>slides-data.js 영구 백업</span>
+                    </button>
+                    <button class="ribbon-btn" style="background: #555; color: #fff;" onclick="PPTStudio.resetToOriginal()" title="원본 데이터로 리셋">
+                        <span class="ribbon-btn-icon">🔄</span>
+                        <span>원본으로 초기화</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. 메인 3단 작업 영역 (좌측 썸네일 | 중앙 16:9 캔버스 | 우측 인스펙터) -->
+    <main id="editor-main-workspace">
+        <!-- 좌측 슬라이드 썸네일 목록 바 -->
+        <aside id="thumbnail-sidebar">
+            <div class="thumbnail-header">
+                <span>슬라이드 목록</span>
+                <button class="ribbon-btn" style="padding: 2px 6px; font-size: 11px;" onclick="PPTStudio.addNewSlide()">+ 추가</button>
+            </div>
+            <div class="thumbnail-list" id="thumbnail-items-container">
+                <!-- 썸네일 아이템 동적 주입 -->
+            </div>
+        </aside>
+
+        <!-- 중앙 메인 16:9 슬라이드 편집 캔버스 -->
+        <section id="canvas-viewport-area">
+            <div id="editor-canvas-scaler">
+                <div class="slide-content-wrapper" id="editor-slide-canvas">
+                    <!-- 슬라이드 내용 인터랙티브 주입 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 우측 속성 인스펙터 사이드바 -->
+        <aside id="inspector-sidebar">
+            <div class="inspector-header">
+                <span>속성 및 서식 인스펙터</span>
+            </div>
+            <div class="inspector-body" id="inspector-dynamic-content">
+                <!-- 동적 속성 폼 -->
+            </div>
+        </aside>
+    </main>
+
+    <!-- 3. 중세국어 옛글 타이핑 스튜디오 모달 (함초롬바탕 기본 탑재) -->
+    <div id="yet-typing-studio-modal" class="yet-typing-studio-modal">
+        <div class="yet-studio-header">
+            <span>⌨️ 중세국어 두벌식 옛글 타이핑 (함초롬바탕 표준)</span>
+            <span style="cursor: pointer; font-size: 18px;" onclick="PPTStudio.closeYetTypingStudio()">✕</span>
+        </div>
+        <div class="yet-studio-body">
+            <!-- 함초롬바탕 실시간 타이핑 디스플레이 -->
+            <textarea id="yet-studio-input" class="yet-studio-display" placeholder="키보드로 두벌식 옛글을 타이핑하거나 아래 자모를 클릭하세요.&#10;(예: Shift+K = ㆍ, Shift+A = ㅿ, Shift+D = ㆁ, Shift+G = ㆆ, . = 거성 방점)"></textarea>
+
+            <!-- 빠른 옛자모 클릭 패드 -->
+            <div>
+                <div style="font-size: 12px; color: #a0aec0; margin-bottom: 6px;">빠른 옛자모 클릭 입력:</div>
+                <div class="yet-quick-pad">
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ㆍ')">ㆍ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ᆢ')">ᆢ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ㅿ')">ㅿ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ㆁ')">ㆁ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ㆆ')">ㆆ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ㅸ')">ㅸ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ㅄ')">ㅄ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ㅳ')">ㅳ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ᄡ')">ᄡ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ᄢ')">ᄢ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ᅇ')">ᅇ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ᆡ')">ᆡ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('\u302E')">· (거성)</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('\u302F')">·· (상성)</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ㆅ')">ㆅ</button>
+                    <button class="btn-yet-key" onclick="YetHangulIME.insertText('ᄛ')">ᄛ</button>
+                </div>
+            </div>
+
+            <!-- 하단 액션 버튼 -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                <button class="ribbon-btn" style="background: #444; color: #fff;" onclick="YetHangulIME.reset()">지우기</button>
+                <button class="ribbon-btn" style="background: #5b21b6; color: #fff;" onclick="YetHangulIME.convertInputToPrecomposed()" title="첫가끝 결합 텍스트를 표준 완성형 유니코드(NFC)로 즉시 변환">
+                    🔄 완성형 유니코드로 변환
+                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="ribbon-btn" style="background: #2b6cb0; color: #fff;" onclick="PPTStudio.insertTypedYetToSlide()">
+                        📥 슬라이드에 옛글 상자로 삽입
+                    </button>
+                    <button class="ribbon-btn" onclick="PPTStudio.closeYetTypingStudio()">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 하단 상태 표시줄 -->
+    <footer id="editor-statusbar">
+        <div class="status-left">
+            <span id="status-slide-count">슬라이드 1 / 62</span>
+            <span id="status-autosave-indicator">⚡ 자동 저장 활성 (1분 주기)</span>
+        </div>
+        <div class="status-right">
+            <span>나눔바른고딕 옛한글 / 함초롬바탕</span>
+            <span>16:9 와이드스크린</span>
+        </div>
+    </footer>
+
+    <!-- 스크립트 로드 -->
+    <script src="js/slides-data.js"></script>
+    <script src="js/yet-hangul-ime.js"></script>
+    <script src="js/ppt-editor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            PPTStudio.init();
+        });
+    </script>
+</body>
+</html>

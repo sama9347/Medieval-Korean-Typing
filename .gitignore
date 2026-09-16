@@ -1,0 +1,14 @@
+# Operating System
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Office and Temp files
+~$*
+*.tmp
+*.pptx
+*.hwpx
+
+# Logs and scratch
+*.log
+node_modules/
